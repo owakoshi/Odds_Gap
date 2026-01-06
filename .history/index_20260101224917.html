@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>オッズギャップ解析</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<h1 class="title">🏇 オッズギャップ解析ツール</h1>
+
+<section class="input-area">
+  <h2>① 三連単オッズ（コピペ）</h2>
+  <textarea id="trifectaInput" placeholder="例：
+1-2-3 12340
+1-3-2 13020
+2-1-3 18500"></textarea>
+</section>
+
+<section class="input-area">
+  <h2>② 単勝オッズ（改行で入力）</h2>
+  <textarea id="winInput" placeholder="例：
+2.3
+5.1
+12.4"></textarea>
+  <p class="hint">※ 1行目＝馬番1、2行目＝馬番2 …</p>
+</section>
+
+<section class="table-area">
+  <h2>③ 判定結果</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>馬番</th>
+        <th>ギャップ</th>
+        <th>判定</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</section>
+
+<div class="actions">
+  <button id="analyzeBtn">解析する</button>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>odds_gap</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<h1 class="title">🏇 Odds Gap</h1>
+
+<section class="input-area">
+  <h2>🏇🏇🏇</h2>
+  <textarea id="trifectaInput"></textarea>
+</section>
+
+<section class="input-area">
+  <h2>🏇</h2>
+  <textarea id="winInput"></textarea>
+  <p class="hint">※ 1行目＝馬番1</p>
+</section>
+
+<section class="table-area">
+  <h2>Score</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>馬番</th>
+        <th>単勝</th>
+        <th>単勝人気</th>
+        <th>判定</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</section>
+
+<div class="actions">
+  <button id="analyzeBtn">解析する</button>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+@media (min-width: 768px) {
+  .input-area,
+  .table-area,
+  .title {
+    max-width: 800px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  /* PCでは列を少し戻す */
+  th:nth-child(2), td:nth-child(2) { width: 80px; }
+  th:nth-child(3), td:nth-child(3) { width: 80px; }
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f6f7f9;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+p {
+  font-size: 11px;
+}
+
+.title {
+  text-align: center;
+  margin: 0 auto 20px;
+  width: 360px;
+}
+
+.input-area,
+.table-area {
+  width: 360px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 0 auto 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+textarea {
+  width: 340px;
+  height: 120px;
+  font-size: 14px;
+  padding: 10px;
+}
+
+table {
+  width: 360px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: center;
+  padding: 8px 4px;
+  box-sizing: border-box;
+}
+
+/* 列幅指定 */
+th:nth-child(1),
+td:nth-child(1) { width: 42px; }   /* 馬番 */
+
+th:nth-child(2),
+td:nth-child(2) { width: 75px; }   /* 単勝 */
+
+th:nth-child(3),
+td:nth-child(3) { width: 75px; }   /* 単勝人気 */
+
+/* 判定列は残り全部 */
+th:nth-child(4),
+td:nth-child(4) {
+  width: auto;
+}
+
+
+tr {
+  text-align: center;
+  padding: 6px;
+  font-size: 12px;
+}
+
+input[type="number"] {
+  width: 80px;
+}
+
+.actions {
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 20px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.judge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.judge-sub {
+  font-size: 11px;
+  text-align: right;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.judge-wrap {
+  flex: 1;              /* ← 残り全部バーに割り当て */
+  height: 16px;
+  background: #eee;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.judge-bar {
+  height: 100%;
+  border-radius: 7px;
+}
+
+/* 5段階 */
+.judge-0 { background: #ccc; }
+.judge-1 { background: #8bc34a; }
+.judge-2 { background: #ffeb3b; }
+.judge-3 { background: #ff9800; }
+.judge-4 { background: #f44336; }
+
+.composite-score {
+  font-size: 11px;
+  margin-top: 4px;
+  text-align: right;
+  color: #555;
+}
+
+
+.fire {
+  width: 18px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.fire-hot {
+  color: #f44336;
+}
+
+.fire-strong {
+  color: #ff9800;
+}
+
+.himo-stars {
+  margin-top: 4px;
+  font-size: 12px;
+  text-align: right;
+  letter-spacing: 1px;
+  color: #f5b301; /* 金色っぽい */
+}
