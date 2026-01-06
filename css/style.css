@@ -1,11 +1,23 @@
-@media (min-width: 768px) {
-  .input-area,
-  .table-area,
-  .title {
-    max-width: 800px;
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
   }
 
-  table {
+  th, td {
+    padding: 4px;
+    font-size: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .judge-row {
+    gap: 4px;
+  }
+
+  .fire {
     font-size: 13px;
   }
 
@@ -31,12 +43,14 @@ p {
 .title {
   text-align: center;
   margin: 0 auto 20px;
-  width: 360px;
+  width: 100%;
+  max-width: 360px;
 }
 
 .input-area,
 .table-area {
-  width: 360px;
+  width: 100%;
+  max-width: 360px;
   background: #fff;
   padding: 15px;
   border-radius: 10px;
@@ -52,7 +66,7 @@ textarea {
 }
 
 table {
-  width: 360px;
+  width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
 }
