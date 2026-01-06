@@ -209,9 +209,7 @@ function renderTable(winOdds, winRank, gapRank, himoStars) {
           <td>${horse}</td>
           <td>-</td>
           <td>-</td>
-          <td>
-            <div class="judge-wrap"></div>
-          </td>
+          <td></td>
         </tr>`;
       continue;
     }
@@ -219,7 +217,7 @@ function renderTable(winOdds, winRank, gapRank, himoStars) {
     const wRank = winRank[i];
     const gRank = gapRank[horse];
 
-    // 判定スコア（暫定）
+    // 判定スコア
     let score = 0;
     if (wRank && gRank) {
       const diff = wRank - gRank;
@@ -239,15 +237,18 @@ function renderTable(winOdds, winRank, gapRank, himoStars) {
     tableBody.innerHTML += `
       <tr>
         <td>${horse}</td>
-        <td>${typeof odds === "number" ? odds.toFixed(1) : "-"}</td>        <td>${wRank}</td>
-        <td>
+        <td>${odds.toFixed(1)}</td>
+        <td>${wRank}</td>
+        <td class="judge-cell">
           <div class="judge-row">
             <span class="fire">${fire}</span>
             <div class="judge-wrap">
               <div class="judge-bar judge-${score}" style="width:${percent}%"></div>
             </div>
           </div>
-          <div class="himo-stars">${renderStars(himoStar)}</div>
+          <div class="himo-stars">
+            ${renderStars(himoStar)}
+          </div>
         </td>
       </tr>
     `;

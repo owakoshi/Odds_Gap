@@ -47,6 +47,9 @@
     }
     .table th, .table td { padding: 8px 6px; border-bottom: 1px solid #232766; }
     .table th { color: var(--muted); font-weight: 600; text-align: left; }
+    .table th:nth-child(4) {
+        text-align: center;
+    }
     .judge-row { display: flex; align-items: center; gap: 6px; }
     .fire { font-size: 16px; }
     .bar-wrap { flex: 1; height: 10px; background: var(--bar); border-radius: 999px; overflow: hidden; }
@@ -56,6 +59,55 @@
       padding: 2px 6px; border-radius: 999px; background: #20266a; color: #cfe6ff; font-size: 11px;
     }
     .hot { color: var(--hot); }
+        /* 判定セル */
+    .judge-cell {
+      padding: 4px;
+    }
+
+    /* 🔥 + バー横並び */
+    .judge-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 🔥 */
+    .fire {
+      width: 18px;
+      text-align: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* バー外枠 */
+    .judge-wrap {
+      flex: 1;
+      height: 14px;
+      background: #eee;
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    /* バー本体 */
+    .judge-bar {
+      height: 100%;
+      border-radius: 7px;
+    }
+
+    /* スコア別色 */
+    .judge-0 { background: #cfd8dc; }
+    .judge-1 { background: #8bc34a; }
+    .judge-2 { background: #ffeb3b; }
+    .judge-3 { background: #ff9800; }
+    .judge-4 { background: #f44336; }
+
+    /* ★ */
+    .himo-stars {
+      font-size: 11px;
+      text-align: right;
+      margin-top: 2px;
+      color: #ff9800;
+    }
 
     @media (min-width: 768px) {
       .grid { grid-template-columns: 1fr 1fr; }
