@@ -253,3 +253,15 @@ function renderTable(winOdds, winRank, gapRank, himoStars) {
     `;
   }
 }
+
+    // ここに既存のJSロジックをそのまま貼り付けてOK
+    // 例: analyzeBtn / renderTable など
+
+    // モバイル用：クリップボードから自動ペースト
+    document.getElementById('pasteBtn').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text.includes('-')) document.getElementById('trifectaInput').value = text;
+        else document.getElementById('winInput').value = text;
+      } catch (e) { alert('ペーストできんかった😭'); }
+    });

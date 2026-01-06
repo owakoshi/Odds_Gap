@@ -2,43 +2,42 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>odds_gap</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Odds_Gap</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <header><h1>🏇Odds_Gap</h1></header>
+  <div class="wrap">
+    <div class="grid">
+      <div class="card">
+        <h2>単勝（貼り付け）</h2>
+        <textarea id="winInput" placeholder="例: 2.3\n3.1\n-\n..."></textarea>
+      </div>
+      <div class="card">
+        <h2>三連単（貼り付け）</h2>
+        <textarea id="trifectaInput" placeholder="例: 6-3-9 44.9\n6-3-11 46.9\n..."></textarea>
+      </div>
+    </div>
 
-<h1 class="title">🏇 Odds Gap</h1>
+    <div class="card" style="margin-top:10px">
+      <div class="row">
+        <button class="btn" id="analyzeBtn">解析する</button>
+        <button class="btn secondary" id="pasteBtn">📋 ペースト</button>
+      </div>
+    </div>
 
-<section class="input-area">
-  <h2>🏇🏇🏇</h2>
-  <textarea id="trifectaInput"></textarea>
-</section>
-
-<section class="input-area">
-  <h2>🏇</h2>
-  <textarea id="winInput"></textarea>
-  <p class="hint">※ 1行目＝馬番1</p>
-</section>
-
-<section class="table-area">
-  <h2>Score</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>馬番</th>
-        <th>単勝</th>
-        <th>単勝人気</th>
-        <th>判定</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-</section>
-
-<div class="actions">
-  <button id="analyzeBtn">解析する</button>
-</div>
-
+    <div class="card" style="margin-top:10px">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>馬</th><th>単勝</th><th>人気</th><th>判定</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
 <script src="js/main.js"></script>
 </body>
 </html>
