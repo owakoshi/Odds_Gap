@@ -193,29 +193,61 @@ function getFireMark(score, himoStar) {
   }
   return "";
 }
+// 判定↓ × 紐↑
+if (judgeScore <= 1 && himoStar >= 4) {
+  warnings.push("判定低×紐高");
+}
+
+// 人気と三連単ギャップ大
+if (wRank >= 8 && gRank <= 3) {
+  warnings.push("人気×三連単乖離");
+}
+
+// 1頭被り
+if (gRank === 1 && himoStar <= 2) {
+  warnings.push("1頭被り");
+}
+
+// ヒモ集中
+if (himoStar === 5) {
+  warnings.push("ヒモ集中");
+}
+
+// 抜け番
+if (judgeScore === 2 && wRank >= 8) {
+  warnings.push("抜け番");
+}
+
+// 押さえ必須
+if (himoStar >= 4 && judgeScore <= 2) {
+  warnings.push("押さえ必須");
+}
 /* =========================
   描画
 ========================= */
 function renderTable(winOdds, winRank, gapRank, himoStars) {
   tableBody.innerHTML = "";
 
+  const validCount = winOdds.filter(v => v !== null).length;
+  const concentration = calcConcentration(winOdds);
+
   for (let i = 0; i < 18; i++) {
     const horse = i + 1;
     const odds = winOdds[i];
-
-    if (odds === null) {
-      tableBody.innerHTML += `
-        <tr class="excluded">
-          <td>${horse}</td>
-          <td>-</td>
-          <td>-</td>
-          <td></td>
-        </tr>`;
-      continue;
-    }
+    if (odds === null) continue;
 
     const wRank = winRank[i];
     const gRank = gapRank[horse];
+    const himoStar = himoStars[horse] || 0;
+
+    const judgeScore = calcJudgeScore(
+      wRank,
+      gRank,
+      validCount,
+      concentration
+    );
+
+    const warnings = [];
 
     // 判定スコア
     let score = 0;
@@ -229,27 +261,27 @@ function renderTable(winOdds, winRank, gapRank, himoStars) {
     }
 
     const percentMap = [15, 35, 55, 75, 100];
-    const percent = percentMap[score];
-
-    const himoStar = himoStars[horse] || 0;
-    const fire = getFireMark(score, himoStar);
+    const percent = percentMap[judgeScore];
+    const fire = getFireMark(judgeScore, himoStar);
+    const noteText = warnings.join(" / ");
 
     tableBody.innerHTML += `
-      <tr>
+      <tr class="horse-row" data-note="${noteText}">
         <td>${horse}</td>
-        <td>${odds.toFixed(1)}</td>
-        <td>${wRank}</td>
+
         <td class="judge-cell">
           <div class="judge-row">
+            ${warnings.length ? `<span class="warn">⚠️</span>` : ""}
             <span class="fire">${fire}</span>
             <div class="judge-wrap">
-              <div class="judge-bar judge-${score}" style="width:${percent}%"></div>
+              <div class="judge-bar judge-${judgeScore}" style="width:${percent}%"></div>
             </div>
           </div>
-          <div class="himo-stars">
-            ${renderStars(himoStar)}
-          </div>
+          <div class="himo-stars">${renderStars(himoStar)}</div>
         </td>
+
+        <td class="odds">${odds.toFixed(1)}</td>
+        <td class="muted">${wRank}</td>
       </tr>
     `;
   }
@@ -259,10 +291,15 @@ function renderTable(winOdds, winRank, gapRank, himoStars) {
     // 例: analyzeBtn / renderTable など
 
     // モバイル用：クリップボードから自動ペースト
-    document.getElementById('pasteBtn').addEventListener('click', async () => {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text.includes('-')) document.getElementById('trifectaInput').value = text;
-        else document.getElementById('winInput').value = text;
-      } catch (e) { alert('ペーストできんかった😭'); }
-    });
+const pasteBtn = document.getElementById('pasteBtn');
+if (pasteBtn) {
+  pasteBtn.addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text.includes('-')) trifectaInput.value = text;
+      else winInput.value = text;
+    } catch (e) {
+      alert('ペーストできんかった😭');
+    }
+  });
+}
