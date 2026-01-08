@@ -4,28 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Odds_Gap</title>
-<link rel="stylesheet" href="css/style.css?v=2">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
+
 <body>
-  <header><h1>🏇Odds_Gap</h1></header>
+  <!-- =========================
+    Header
+  ========================= -->
+  <header>
+    <h1>🏇 Odds_Gap</h1>
+  </header>
+
+  <!-- =========================
+    Main
+  ========================= -->
   <div class="wrap">
+
+    <!-- 入力エリア -->
     <div class="grid">
       <div class="card">
-        <h2>単勝（貼り付け）</h2>
-        <textarea id="winInput" placeholder="例: 2.3\n3.1\n-\n..."></textarea>
+        <h2>単勝オッズ（貼り付け）</h2>
+        <textarea
+          id="winInput"
+          placeholder="例:2.3..."></textarea>
       </div>
+
       <div class="card">
         <h2>三連単（貼り付け）</h2>
-        <textarea id="trifectaInput" placeholder="例: 6-3-9 44.9\n6-3-11 46.9\n..."></textarea>
+        <textarea
+          id="trifectaInput"
+          placeholder="例:6-3-9 44.9..."></textarea>
       </div>
     </div>
 
+    <!-- 解析ボタン -->
     <div class="card" style="margin-top:10px">
       <div class="row">
-        <button class="btn" id="analyzeBtn">解析する</button>
+        <button class="btn" id="analyzeBtn">
+          解析する
+        </button>
       </div>
     </div>
 
+    <!-- 結果テーブル -->
     <div class="card" style="margin-top:10px">
       <table class="table">
         <thead>
@@ -36,10 +59,15 @@
             <th>人気</th>
           </tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody id="tableBody">
+          <!-- JSで描画 -->
+        </tbody>
       </table>
     </div>
+
   </div>
-<script src="js/main.js"></script>
+
+  <!-- JS -->
+  <script src="js/main.js?v=3"></script>
 </body>
 </html>
