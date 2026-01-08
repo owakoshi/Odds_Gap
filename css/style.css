@@ -205,9 +205,15 @@ textarea {
   Stars / Text
 ========================= */
 .stars {
-  display: inline-block;
-  font-size: 11px;
-  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stars .gap {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff6b6b;   /* 赤で目立たせる */
 }
 
 

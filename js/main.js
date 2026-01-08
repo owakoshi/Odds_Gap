@@ -107,15 +107,28 @@ function normalizeHimoStars(raw) {
   });
   return stars;
 }
-function renderStars(count) {
+function renderStars(count, gap = 0) {
   if (!count) return '<span class="stars s0">—</span>';
+
+  const stars = "★".repeat(count) + "☆".repeat(5 - count);
+  const gapText = gap >= 1 ? `<span class="gap">+${gap}</span>` : "";
 
   return `
     <span class="stars s${count}">
-      ${"★".repeat(count)}${"☆".repeat(5 - count)}
+      ${stars}
+      ${gapText}
     </span>
   `;
 }
+function expectedHimoStarsByRank(rank) {
+  if (rank <= 2) return 5;
+  if (rank <= 4) return 4;
+  if (rank <= 7) return 3;
+  if (rank <= 11) return 2;
+  return 1;
+}
+const expected = expectedHimoStarsByRank(wRank);
+const himoGap = himo - expected;   // ← これが +2, +3
 
 /* =========================
   歪み
@@ -155,13 +168,22 @@ function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
     const wRank = winRank[i];
     const gRank = gapRank[horse];
     const himo = himoStars[horse] || 0;
+    const expected = expectedHimoStarsByRank(wRank);
+    const himoGap = himo - expected;
     const d = distortions[horse];
+    if (himoGap >= 2 && wRank >= 6) warnings.push("人気薄×紐集中");
+    if (himoGap >= 3) warnings.push("異常紐集中");
 
     const warnings = [];
     if (d <= -1.5 && himo >= 4) warnings.push("歪み×紐厚");
     if (wRank >= 8 && gRank <= 3) warnings.push("爆穴乖離");
     if (himo === 5) warnings.push("ヒモ集中");
     if (d >= 2.0) warnings.push("過小評価");
+    if (himoGap >= 2 && wRank >= 6)
+      warnings.push("人気薄×紐集中");
+
+    if (himoGap >= 3)
+      warnings.push("異常紐集中");
 
     const isHot = d <= -1.5 && himo >= 3;
     const isWarn = Math.abs(d) >= 2.2;
@@ -180,7 +202,9 @@ function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
             <div class="distort-bar ${d < 0 ? 'minus':'plus'}"
               style="left:${left}%;width:${width}%"></div>
           </div>
-          <div class="himo-stars">${renderStars(himo)}</div>
+          <div class="himo-stars">
+            ${renderStars(himo, himoGap)}
+          </div>
         </td>
         <td>${odds.toFixed(1)}</td>
         <td>${wRank}</td>
