@@ -127,21 +127,19 @@ function expectedHimoStarsByRank(rank) {
   if (rank <= 11) return 2;
   return 1;
 }
-const expected = expectedHimoStarsByRank(wRank);
-const himoGap = himo - expected;   // ← これが +2, +3
 
 /* =========================
-  歪み
+歪み
 ========================= */
 function calcDistortions(headMinOdds) {
   const arr = Object.values(headMinOdds);
   if (arr.length < 3) return {};
-
+  
   const logs = arr.map(o => Math.log(o));
   const avg = logs.reduce((a,b)=>a+b)/logs.length;
   const std = Math.sqrt(logs.reduce((s,l)=>s+(l-avg)**2,0)/logs.length);
   if (std < .15) return {};
-
+  
   const d = {};
   Object.entries(headMinOdds).forEach(([h,o])=>{
     d[h] = (Math.log(o) - avg) / std;
@@ -155,49 +153,51 @@ function distortionToPercent(d) {
 }
 
 /* =========================
-  描画
+描画
 ========================= */
 function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
   tableBody.innerHTML = "";
-
+  
   for (let i = 0; i < 18; i++) {
     const horse = i + 1;
     const odds = winOdds[i];
     if (odds === null) continue;
-
+    
     // ✅ ① 先に全部定義
     const wRank = winRank[i];
     const gRank = gapRank[horse];
     const himo  = himoStars[horse] || 0;
     const d     = distortions[horse];
-
+    
     // ✅ ② warnings は最初に
     const warnings = [];
-
+    
     // --- 判定 ---
     if (d !== undefined && d <= -1.5 && himo >= 4) {
       warnings.push("歪み×紐厚");
     }
-
+    
     if (wRank >= 8 && gRank <= 3) {
       warnings.push("爆穴乖離");
     }
-
+    
     if (himo === 5) {
       warnings.push("ヒモ集中");
     }
-
+    
     if (d !== undefined && d >= 2.0) {
       warnings.push("過小評価");
     }
-
+    
     const isHot  = d !== undefined && d <= -1.5 && himo >= 3;
     const isWarn = d !== undefined && Math.abs(d) >= 2.2;
-
+    
     const p = d !== undefined ? distortionToPercent(d) : 50;
     const left  = p < 50 ? p : 50;
     const width = Math.abs(50 - p);
-
+    const expected = expectedHimoStarsByRank(wRank);
+    const himoGap = himo - expected;   // ← これが +2, +3
+    
     tableBody.innerHTML += `
       <tr class="horse-row" data-note="${warnings.join(" / ")}">
         <td>${horse}</td>
@@ -208,7 +208,7 @@ function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
             <div class="distort-bar ${d < 0 ? 'minus' : 'plus'}"
               style="left:${left}%;width:${width}%"></div>
           </div>
-          <div class="himo-stars">${renderStars(himo)}</div>
+          <div class="himo-stars">${renderStars(himo, himoGap)}</div>
         </td>
         <td>${odds.toFixed(1)}</td>
         <td>${wRank}</td>
