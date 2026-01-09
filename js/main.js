@@ -165,31 +165,37 @@ function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
     const odds = winOdds[i];
     if (odds === null) continue;
 
+    // ✅ ① 先に全部定義
     const wRank = winRank[i];
     const gRank = gapRank[horse];
-    const himo = himoStars[horse] || 0;
-    const expected = expectedHimoStarsByRank(wRank);
-    const himoGap = himo - expected;
-    const d = distortions[horse];
-    if (himoGap >= 2 && wRank >= 6) warnings.push("人気薄×紐集中");
-    if (himoGap >= 3) warnings.push("異常紐集中");
+    const himo  = himoStars[horse] || 0;
+    const d     = distortions[horse];
 
+    // ✅ ② warnings は最初に
     const warnings = [];
-    if (d <= -1.5 && himo >= 4) warnings.push("歪み×紐厚");
-    if (wRank >= 8 && gRank <= 3) warnings.push("爆穴乖離");
-    if (himo === 5) warnings.push("ヒモ集中");
-    if (d >= 2.0) warnings.push("過小評価");
-    if (himoGap >= 2 && wRank >= 6)
-      warnings.push("人気薄×紐集中");
 
-    if (himoGap >= 3)
-      warnings.push("異常紐集中");
+    // --- 判定 ---
+    if (d !== undefined && d <= -1.5 && himo >= 4) {
+      warnings.push("歪み×紐厚");
+    }
 
-    const isHot = d <= -1.5 && himo >= 3;
-    const isWarn = Math.abs(d) >= 2.2;
+    if (wRank >= 8 && gRank <= 3) {
+      warnings.push("爆穴乖離");
+    }
+
+    if (himo === 5) {
+      warnings.push("ヒモ集中");
+    }
+
+    if (d !== undefined && d >= 2.0) {
+      warnings.push("過小評価");
+    }
+
+    const isHot  = d !== undefined && d <= -1.5 && himo >= 3;
+    const isWarn = d !== undefined && Math.abs(d) >= 2.2;
 
     const p = d !== undefined ? distortionToPercent(d) : 50;
-    const left = p < 50 ? p : 50;
+    const left  = p < 50 ? p : 50;
     const width = Math.abs(50 - p);
 
     tableBody.innerHTML += `
@@ -199,12 +205,10 @@ function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
           ${isWarn ? "⚠️" : ""}${isHot ? "🔥" : ""}
           <div class="distort-wrap">
             <div class="center-line"></div>
-            <div class="distort-bar ${d < 0 ? 'minus':'plus'}"
+            <div class="distort-bar ${d < 0 ? 'minus' : 'plus'}"
               style="left:${left}%;width:${width}%"></div>
           </div>
-          <div class="himo-stars">
-            ${renderStars(himo, himoGap)}
-          </div>
+          <div class="himo-stars">${renderStars(himo)}</div>
         </td>
         <td>${odds.toFixed(1)}</td>
         <td>${wRank}</td>
