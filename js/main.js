@@ -157,61 +157,92 @@ function distortionToPercent(d) {
 ========================= */
 function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
   tableBody.innerHTML = "";
-  
+
+  // --- 歪みRank作成 ---
+  const distortionArr = Object.entries(distortions)
+    .map(([h, d]) => ({ h: Number(h), d }))
+    .sort((a, b) => a.d - b.d); // 売れすぎ順
+
+  const distortionRank = {};
+  distortionArr.forEach((v, i) => {
+    distortionRank[v.h] = i + 1;
+  });
+
   for (let i = 0; i < 18; i++) {
     const horse = i + 1;
-    const odds = winOdds[i];
+    const odds  = winOdds[i];
     if (odds === null) continue;
-    
-    // ✅ ① 先に全部定義
+
+    // --- 基本データ ---
     const wRank = winRank[i];
-    const gRank = gapRank[horse];
     const himo  = himoStars[horse] || 0;
     const d     = distortions[horse];
-    
-    // ✅ ② warnings は最初に
-    const warnings = [];
-    
-    // --- 判定 ---
-    if (d !== undefined && d <= -1.5 && himo >= 4) {
-      warnings.push("歪み×紐厚");
+
+    const dRank = distortionRank[horse];
+    const gap   = (dRank && wRank) ? (wRank - dRank) : 0;
+
+    // --- 歪みスコア（-100〜100） ---
+    let score = 0;
+    if (d !== undefined) {
+      score = Math.round(
+        Math.max(-2.5, Math.min(2.5, d)) / 2.5 * 100
+      );
     }
-    
-    if (wRank >= 8 && gRank <= 3) {
-      warnings.push("爆穴乖離");
-    }
-    
-    if (himo === 5) {
-      warnings.push("ヒモ集中");
-    }
-    
-    if (d !== undefined && d >= 2.0) {
-      warnings.push("過小評価");
-    }
-    
-    const isHot  = d !== undefined && d <= -1.5 && himo >= 3;
-    const isWarn = d !== undefined && Math.abs(d) >= 2.2;
-    
+
+    // --- バー描画用 ---
     const p = d !== undefined ? distortionToPercent(d) : 50;
     const left  = p < 50 ? p : 50;
     const width = Math.abs(50 - p);
-    const expected = expectedHimoStarsByRank(wRank);
-    const himoGap = himo - expected;   // ← これが +2, +3
-    
+
+    // --- 警告判定 ---
+    const warnings = [];
+    if (d !== undefined && d <= -1.5 && himo >= 4) warnings.push("歪み×紐厚");
+    if (wRank >= 8 && gap >= 6) warnings.push("人気薄ヒモ集中");
+    if (himo === 5) warnings.push("ヒモ集中");
+    if (d !== undefined && d >= 2.0) warnings.push("過小評価");
+
+    const isHot  = d !== undefined && d <= -1.5 && himo >= 3;
+    const isWarn = d !== undefined && Math.abs(d) >= 2.2;
+
+    // --- 表示 ---
     tableBody.innerHTML += `
       <tr class="horse-row" data-note="${warnings.join(" / ")}">
-        <td>${horse}</td>
-        <td>
+
+        <!-- 馬番 -->
+        <td class="horse-no">${horse}</td>
+
+        <!-- 判定バー＋紐 -->
+        <td class="judge-cell">
           ${isWarn ? "⚠️" : ""}${isHot ? "🔥" : ""}
           <div class="distort-wrap">
             <div class="center-line"></div>
-            <div class="distort-bar ${d < 0 ? 'minus' : 'plus'}"
+            <div class="distort-bar ${d < 0 ? "minus" : "plus"}"
               style="left:${left}%;width:${width}%"></div>
           </div>
-          <div class="himo-stars">${renderStars(himo, himoGap)}</div>
+          <div class="himo-stars">
+            ${renderStars(himo, gap >= 2 ? gap : 0)}
+          </div>
         </td>
-        <td>${odds.toFixed(1)}</td>
-        <td>${wRank}</td>
+
+        <!-- 歪みスコア -->
+          <td class="score-cell">
+            <span class="score ${score <= -60 ? "score-hot" : score >= 40 ? "score-cold" : ""}">
+              ${score}
+            </span>
+            ${gap !== 0
+              ? `<span class="gap ${gap >= 5 ? "gap-strong" : ""}">
+                  (${gap >= 0 ? "+" : ""}${gap})
+                </span>`
+              : ""
+            }
+          </td>
+
+        <!-- 単勝 -->
+        <td class="win-cell">
+          ${odds.toFixed(1)}
+          <span class="rank">(${wRank})</span>
+        </td>
+
       </tr>
     `;
   }
