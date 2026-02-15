@@ -167,30 +167,31 @@ textarea {
 }
 
 /* 歪みバー */
-.distort-wrap {
-  position: relative;
-  flex: 1;
-  height: 14px;
-  background: var(--bar-bg);
-  border-radius: 7px;
-  overflow: hidden;
+.distort-wrap{
+  position:relative;
+  width:140px;
+  height:10px;
+  background:#222;
+  border-radius:4px;
+  overflow:hidden;
 }
 
-.center-line {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: rgba(255,255,255,.25);
-  transform: translateX(-1px);
+.distort-bar{
+  background:linear-gradient(90deg,#6cf2c2,#5bd3ff);
+  height:10px;
+  border-radius:4px;
 }
 
-.distort-bar {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  border-radius: 7px;
+.renka{
+  font-size:11px;
+  margin-left:4px;
+  color:#9aa0b4;
+}
+
+.renka-hot{
+  color:#ff6b6b;
+  font-weight:700;
+  text-shadow:0 0 4px rgba(255,107,107,.6);
 }
 
 .distort-bar.minus {

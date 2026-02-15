@@ -25,225 +25,235 @@ analyzeBtn.addEventListener("click", () => {
 /* =========================
   単勝
 ========================= */
-function parseWinOdds() {
-  const odds = winInput.value.trim().split(/\n+/).map(v => {
-    const n = parseFloat(v);
-    return (isNaN(n) || v.trim() === "-" || v.trim() === "") ? null : n;
+function parseWinOdds(){
+  const odds = winInput.value.trim().split(/\n+/).map(v=>{
+    const n=parseFloat(v);
+    return (isNaN(n)||v.trim()===""||v.trim()==="-")?null:n;
   });
-  while (odds.length < 18) odds.push(null);
-  return odds.slice(0, 18);
+  while(odds.length<18) odds.push(null);
+  return odds.slice(0,18);
 }
 
-function calcWinRank(winOdds) {
-  const valid = winOdds
-    .map((o, i) => ({ o, i }))
-    .filter(v => v.o !== null)
-    .sort((a, b) => a.o - b.o);
+function calcWinRank(winOdds){
+  const valid=winOdds.map((o,i)=>({o,i}))
+    .filter(v=>v.o!==null)
+    .sort((a,b)=>a.o-b.o);
 
-  const rank = Array(18).fill(null);
-  valid.forEach((v, i) => rank[v.i] = i + 1);
+  const rank=Array(18).fill(null);
+  valid.forEach((v,i)=>rank[v.i]=i+1);
   return rank;
 }
 
 /* =========================
   三連単 → 頭最安
 ========================= */
-function calcHeadMinFromTrifecta(text) {
-  const result = {};
-  text.trim().split("\n").forEach(line => {
-    const [combo, oddsStr] = line.trim().split(/\s+/);
-    if (!combo || !oddsStr) return;
+function calcHeadMinFromTrifecta(text){
+  const result={};
+  text.trim().split("\n").forEach(line=>{
+    const [combo,oddsStr]=line.trim().split(/\s+/);
+    if(!combo||!oddsStr)return;
 
-    const odds = parseFloat(oddsStr);
-    const head = parseInt(combo.split("-")[0], 10);
-    if (isNaN(odds) || isNaN(head)) return;
+    const odds=parseFloat(oddsStr);
+    const head=parseInt(combo.split("-")[0],10);
+    if(isNaN(odds)||isNaN(head))return;
 
-    if (!result[head] || odds < result[head]) result[head] = odds;
+    if(!result[head]||odds<result[head]) result[head]=odds;
   });
   return result;
 }
 
-function calcGapRank(headMinOdds) {
-  const rank = {};
+function calcGapRank(headMinOdds){
+  const rank={};
   Object.entries(headMinOdds)
-    .sort((a, b) => a[1] - b[1])
-    .forEach(([h], i) => rank[h] = i + 1);
+    .sort((a,b)=>a[1]-b[1])
+    .forEach(([h],i)=>rank[h]=i+1);
   return rank;
 }
 
 /* =========================
   紐集中
 ========================= */
-function calcHimoConcentration(text) {
-  const score = {};
-  text.trim().split("\n").forEach(line => {
-    const [combo, oddsStr] = line.trim().split(/\s+/);
-    if (!combo || !oddsStr) return;
+function calcHimoConcentration(text){
+  const score={};
+  text.trim().split("\n").forEach(line=>{
+    const [combo,oddsStr]=line.trim().split(/\s+/);
+    if(!combo||!oddsStr)return;
 
-    const odds = parseFloat(oddsStr);
-    const c = combo.split("-");
-    if (c.length !== 3 || isNaN(odds)) return;
+    const odds=parseFloat(oddsStr);
+    const c=combo.split("-");
+    if(c.length!==3||isNaN(odds))return;
 
-    const w = 1 / Math.log(odds + 1);
-    [c[1], c[2]].forEach((h, i) => {
-      const n = parseInt(h, 10);
-      if (n >= 1 && n <= 18) {
-        score[n] = (score[n] || 0) + (i === 0 ? 1.0 : 0.7) * w;
+    const w=1/Math.log(odds+1);
+
+    [c[1],c[2]].forEach((h,i)=>{
+      const n=parseInt(h,10);
+      if(n>=1&&n<=18){
+        score[n]=(score[n]||0)+(i===0?1.0:0.7)*w;
       }
     });
   });
   return score;
 }
 
-function normalizeHimoStars(raw) {
-  const vals = Object.values(raw);
-  if (!vals.length) return {};
+function normalizeHimoStars(raw){
+  const vals=Object.values(raw);
+  if(!vals.length) return {};
 
-  const max = Math.max(...vals), min = Math.min(...vals);
-  const stars = {};
-  Object.entries(raw).forEach(([h, v]) => {
-    const r = (v - min) / (max - min || 1);
-    stars[h] = r >= .8 ? 5 : r >= .65 ? 4 : r >= .45 ? 3 : r >= .25 ? 2 : 1;
+  const max=Math.max(...vals),min=Math.min(...vals);
+  const stars={};
+
+  Object.entries(raw).forEach(([h,v])=>{
+    const r=(v-min)/(max-min||1);
+    stars[h]=r>=.8?5:r>=.65?4:r>=.45?3:r>=.25?2:1;
   });
   return stars;
-}
-function renderStars(count, gap = 0) {
-  if (!count) return '<span class="stars s0">—</span>';
-
-  const stars = "★".repeat(count) + "☆".repeat(5 - count);
-  const gapText = gap >= 1 ? `<span class="gap">+${gap}</span>` : "";
-
-  return `
-    <span class="stars s${count}">
-      ${stars}
-      ${gapText}
-    </span>
-  `;
-}
-function expectedHimoStarsByRank(rank) {
-  if (rank <= 2) return 5;
-  if (rank <= 4) return 4;
-  if (rank <= 7) return 3;
-  if (rank <= 11) return 2;
-  return 1;
 }
 
 /* =========================
 歪み
 ========================= */
-function calcDistortions(headMinOdds) {
-  const arr = Object.values(headMinOdds);
-  if (arr.length < 3) return {};
-  
-  const logs = arr.map(o => Math.log(o));
-  const avg = logs.reduce((a,b)=>a+b)/logs.length;
-  const std = Math.sqrt(logs.reduce((s,l)=>s+(l-avg)**2,0)/logs.length);
-  if (std < .15) return {};
-  
-  const d = {};
+function calcDistortions(headMinOdds){
+  const arr=Object.values(headMinOdds);
+  if(arr.length<3) return {};
+
+  const logs=arr.map(o=>Math.log(o));
+  const avg=logs.reduce((a,b)=>a+b)/logs.length;
+  const std=Math.sqrt(logs.reduce((s,l)=>s+(l-avg)**2,0)/logs.length);
+
+  if(std<.15) return {};
+
+  const d={};
   Object.entries(headMinOdds).forEach(([h,o])=>{
-    d[h] = (Math.log(o) - avg) / std;
+    d[h]=(Math.log(o)-avg)/std;
   });
   return d;
 }
 
-function distortionToPercent(d) {
-  const c = Math.max(-2.5, Math.min(2.5, d));
-  return ((c + 2.5) / 5) * 100;
+/* =========================
+正規化
+========================= */
+function normDist(d){
+  if(d===undefined) return .5;
+  const c=Math.max(-2.5,Math.min(2.5,d));
+  return (c+2.5)/5;
+}
+
+function normGap(g){
+  if(!g) return .5;
+  const c=Math.max(-10,Math.min(10,g));
+  return (c+10)/20;
 }
 
 /* =========================
 描画
 ========================= */
-function renderTable(winOdds, winRank, gapRank, himoStars, distortions) {
-  tableBody.innerHTML = "";
+function renderTable(winOdds,winRank,gapRank,himoStars,distortions){
 
-  // --- 歪みRank作成 ---
-  const distortionArr = Object.entries(distortions)
-    .map(([h, d]) => ({ h: Number(h), d }))
-    .sort((a, b) => a.d - b.d); // 売れすぎ順
+  tableBody.innerHTML="";
 
-  const distortionRank = {};
-  distortionArr.forEach((v, i) => {
-    distortionRank[v.h] = i + 1;
-  });
+  const rows=[];
 
-  for (let i = 0; i < 18; i++) {
-    const horse = i + 1;
-    const odds  = winOdds[i];
-    if (odds === null) continue;
+  /* ---- まず全頭スコア算出 ---- */
+  for(let i=0;i<18;i++){
+    const horse=i+1;
+    const odds=winOdds[i];
+    if(odds===null) continue;
 
-    // --- 基本データ ---
-    const wRank = winRank[i];
-    const himo  = himoStars[horse] || 0;
-    const d     = distortions[horse];
+    const wRank=winRank[i];
+    const himo=himoStars[horse]||0;
+    const d=distortions[horse];
 
-    const dRank = distortionRank[horse];
-    const gap   = (dRank && wRank) ? (wRank - dRank) : 0;
+    const distNorm=normDist(d);
+    const himoNorm=himo/5;
 
-    // --- 歪みスコア（-100〜100） ---
-    let score = 0;
-    if (d !== undefined) {
-      score = Math.round(
-        Math.max(-2.5, Math.min(2.5, d)) / 2.5 * 100
-      );
-    }
+    const dRank=gapRank[horse];
+    const gap=(dRank&&wRank)?(wRank-dRank):0;
+    const gapNorm=normGap(gap);
 
-    // --- バー描画用 ---
-    const p = d !== undefined ? distortionToPercent(d) : 50;
-    const left  = p < 50 ? p : 50;
-    const width = Math.abs(50 - p);
+    const renkaExpect=himoNorm-distNorm;
+    const renkaNorm=Math.max(0,Math.min(1,(renkaExpect+1)/2));
 
-    // --- 警告判定 ---
-    const warnings = [];
-    if (d !== undefined && d <= -1.5 && himo >= 4) warnings.push("歪み×紐厚");
-    if (wRank >= 8 && gap >= 6) warnings.push("人気薄ヒモ集中");
-    if (himo === 5) warnings.push("ヒモ集中");
-    if (d !== undefined && d >= 2.0) warnings.push("過小評価");
+    const finalScore=
+      distNorm*0.4+
+      himoNorm*0.4+
+      renkaNorm*0.6+
+      gapNorm*0.3;
 
-    const isHot  = d !== undefined && d <= -1.5 && himo >= 3;
-    const isWarn = d !== undefined && Math.abs(d) >= 2.2;
+    rows.push({
+      horse,odds,wRank,himo,d,
+      finalScore,
+      renkaExpect
+    });
+  }
 
-    // --- 表示 ---
-    tableBody.innerHTML += `
-      <tr class="horse-row" data-note="${warnings.join(" / ")}">
+  /* ---- スコア順位 ---- */
+  rows.sort((a,b)=>b.finalScore-a.finalScore);
+  rows.forEach((r,i)=>r.scoreRank=i+1);
 
-        <!-- 馬番 -->
-        <td class="horse-no">${horse}</td>
+  /* ---- 表示順を馬番順に戻す ---- */
+  rows.sort((a,b)=>a.horse-b.horse);
 
-        <!-- 判定バー＋紐 -->
+  /* ---- 描画 ---- */
+  rows.forEach(r=>{
+
+    const display=Math.round(r.finalScore*100);
+    const gap=r.wRank-r.scoreRank;
+    const barW=display;
+
+    const isHot=r.d!==undefined&&r.d<=-1.5&&r.himo>=3;
+    const isWarn=r.d!==undefined&&Math.abs(r.d)>=2.2;
+
+    let barClass="bar-mid";
+
+    const barOpacity=0.15 + (display/100)*0.85;
+
+    
+
+    tableBody.innerHTML+=`
+      <tr class="horse-row">
+
+        <td>${r.horse}</td>
+
         <td class="judge-cell">
-          ${isWarn ? "⚠️" : ""}${isHot ? "🔥" : ""}
-          <div class="distort-wrap">
-            <div class="center-line"></div>
-            <div class="distort-bar ${d < 0 ? "minus" : "plus"}"
-              style="left:${left}%;width:${width}%"></div>
+          <div class="judge-row">
+
+            <div class="fire">
+              ${isWarn?"⚠️":""}${isHot?"🔥":""}
+            </div>
+
+            <div class="distort-wrap">
+              <div class="distort-bar"
+                style="
+                  left:0;
+                  width:${barW}%;
+                  opacity:${barOpacity};
+                ">
+              </div>
+            </div>
+
           </div>
-          <div class="himo-stars">
-            ${renderStars(himo, gap >= 2 ? gap : 0)}
+
+          <div class="stars s${r.himo}">
+            ${"★".repeat(r.himo)}${"☆".repeat(5-r.himo)}
+
+            <span class="renka ${r.renkaExpect>=0.25?"renka-hot":""}">
+              (${r.renkaExpect.toFixed(2)})
+            </span>
           </div>
         </td>
 
-        <!-- 歪みスコア -->
-          <td class="score-cell">
-            <span class="score ${score <= -60 ? "score-hot" : score >= 40 ? "score-cold" : ""}">
-              ${score}
-            </span>
-            ${gap !== 0
-              ? `<span class="gap ${gap >= 5 ? "gap-strong" : ""}">
-                  (${gap >= 0 ? "+" : ""}${gap})
-                </span>`
-              : ""
-            }
-          </td>
+        <td>
+          ${display}
+          <span class="gap">
+            (${gap>=0?"+":""}${gap})
+          </span>
+        </td>
 
-        <!-- 単勝 -->
-        <td class="win-cell">
-          ${odds.toFixed(1)}
-          <span class="rank">(${wRank})</span>
+        <td>
+          ${r.odds.toFixed(1)} (${r.wRank})
         </td>
 
       </tr>
     `;
-  }
+  });
 }
